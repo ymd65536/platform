@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: cicd_handson
+Parameters:
+  PjName:
+    Type: String
+    Default: image-dev
+Resources:
+  # Save Artifact
+  ImageDevBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      VersioningConfiguration:
+        Status: "Suspended"
+      BucketName: !Sub "${PjName}-bucket-${AWS::AccountId}"
+      AccessControl: "Private"
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${PjName}"
+Outputs:
+  Arn:
+    Value: !GetAtt ImageDevBucket.Arn
+    Export:
+      Name: ImageDevBucketArn
+
+  Name:
+    Value: !Ref ImageDevBucket
+    Export:
+      Name: ImageDevBucketName

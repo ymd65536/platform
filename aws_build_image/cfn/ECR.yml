@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: ImageDev
+Parameters:
+  PjName:
+    Type: String
+    Default: image-dev
+Resources:
+  # ECR
+  ImageDevCodeBuildECR:
+    Type: "AWS::ECR::Repository"
+    Properties:
+      RepositoryName: !Sub "${PjName}"
+Outputs:
+  ImageDevECRArn:
+    Value: !GetAtt ImageDevCodeBuildECR.Arn
+    Export:
+      Name: ImageDevECRImageArn
+  ImageDevECR:
+    Value: !Ref ImageDevCodeBuildECR
+    Export:
+      Name: ImageDevECRImageURL

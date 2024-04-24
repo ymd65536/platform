@@ -1,0 +1,2 @@
+ARG AWS_ACCOUNT_ID
+FROM ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/image-dev
