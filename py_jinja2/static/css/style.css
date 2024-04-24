@@ -1,0 +1,21 @@
+  p {
+    font-size: 14px;
+  }
+
+  h1 {
+    font-size: 24px;
+    margin: 0px;
+  }
+  
+  .result {
+    background-color: #ffffff;
+    width: 600px;
+    margin: 30px auto;
+    text-align: center;
+    border: 1px solid #d1d1d1;
+    padding: 30px;
+  }
+
+  body {
+    background-color: #fafafa;
+  }
