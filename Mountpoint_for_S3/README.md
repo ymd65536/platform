@@ -172,6 +172,14 @@ Outputs:
     Description: The VPC ID
     Value: !Ref VPC
 
+  InstanceIdA:
+    Description: The Instance ID
+    Value: !Ref MyInstanceA
+
+  InstanceIdB:
+    Description: The Instance ID
+    Value: !Ref MyInstanceB
+
   PublicSubnetId:
     Description: The Subnet ID
     Value: !Ref PublicSubnet
