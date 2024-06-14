@@ -117,3 +117,131 @@ CodeBuildのセットアップは以下の手順で行います。
 3. CloudFormationでCodeBuildのスタックを作成
 4. CloudFormationでCodePipelineのスタックを作成
 5. 実行結果の確認
+
+## AWS CodeArtifactのセットアップ
+
+AWS CloudShellを利用してCodeArtifactのセットアップを行います。
+
+### 環境変数の設定
+
+```sh
+```bash
+export AWS_DOMAIN="cf-handson-domain" && echo $AWS_DOMAIN
+export REPOSITORY_NAME="cfhandson"
+export AWS_ACCOUNT_ID=`aws sts get-caller-identity --query 'Account' --output text` && echo $AWS_ACCOUNT_ID
+export AWS_DEFAULT_REGION="ap-northeast-1" && echo $AWS_DEFAULT_REGION
+export REPOSITORY_NAME=cf-handson-domain
+```
+
+### ドメインの作成
+
+CodeArtifactのドメインを作成します。
+
+```bash
+aws codeartifact create-domain --domain cf-handson-domain
+```
+
+### リポジトリを作成する
+
+ドメインではパッケージを格納できないため、リポジトリを作成します。
+
+```sh
+aws codeartifact create-repository --domain $AWS_DOMAIN --domain-owner $AWS_ACCOUNT_ID --repository $REPOSITORY_NAME
+```
+
+### npm-storeを作成する
+
+リポジトリにはnpmのパッケージをいれたいため、まずはnpm-storeを作成します。
+
+```sh
+aws codeartifact create-repository --domain $AWS_DOMAIN --domain-owner $AWS_ACCOUNT_ID --repository npm-store
+```
+
+### リポジトリとnpm-store を接続する
+
+npm-storeを作成したあとはリポジトリとnpm-storeを接続します。
+
+```sh
+aws codeartifact associate-external-connection --domain $AWS_DOMAIN  --domain-owner $AWS_ACCOUNT_ID --repository npm-store --external-connection "public:npmjs"
+```
+
+### リポジトリを更新する
+
+最後にリポジトリを更新します。
+
+```sh
+aws codeartifact update-repository --repository $REPOSITORY_NAME --domain $AWS_DOMAIN  --domain-owner $AWS_ACCOUNT_ID --upstreams repositoryName=npm-store
+```
+
+### CodeArtifactにログイン
+
+エンドポイントの取得やトークンの取得が必要となる為、CodeArtifactににログインします。
+
+```sh
+aws codeartifact login --tool npm --domain $AWS_DOMAIN --region $AWS_DEFAULT_REGION --domain-owner $AWS_ACCOUNT_ID --repository $REPOSITORY_NAME
+```
+
+### エンドポイントURLの取得とCODEARTIFACT_AUTH_TOKENの発行
+
+```sh
+export CODEARTIFACT_URL=`aws codeartifact get-repository-endpoint --domain $AWS_DOMAIN --domain-owner $AWS_ACCOUNT_ID --repository $REPOSITORY_NAME --format npm` && echo $CODEARTIFACT_URL
+export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain $AWS_DOMAIN --region $AWS_DEFAULT_REGION --domain-owner $AWS_ACCOUNT_ID --query authorizationToken --output text` && echo $CODEARTIFACT_AUTH_TOKEN
+
+```
+
+### yarnの設定
+
+CodeArtifactとパッケージマネージャを接続する為にyarnの設定を変更します。
+※このハンズオンの最後に設定を削除します。
+
+まずはインストールを実行します。
+
+```bash
+sudo npm install -g yarn
+```
+
+```sh
+yarn config set npmRegistryServer "$CODEARTIFACT_URL"
+yarn config set 'npmRegistries["$CODEARTIFACT_URL"].npmAuthToken' "${CODEARTIFACT_AUTH_TOKEN}"
+yarn config set 'npmRegistries["$CODEARTIFACT_URL"].npmAlwaysAuth' "true"
+```
+
+### パッケージを登録
+
+CodeArtifactにパッケージが登録されていないことを確認します。
+
+```sh
+aws codeartifact list-packages --domain $AWS_DOMAIN --repository $REPOSITORY_NAME --query 'packages' --output text
+```
+
+```sh
+cd ./sample-package
+```
+
+CodeArtifactにパッケージを登録します。
+
+```sh
+npm publish
+```
+
+登録されたパッケージの一覧を表示します。
+
+```sh
+aws codeartifact list-packages --domain $AWS_DOMAIN --repository $REPOSITORY_NAME
+```
+
+### CodeArtifactに登録したパッケージをsample-appに読み込む
+
+サンプルアプリケーションの`sample-app`に作成したパッケージを読み込みます。
+
+```sh
+cd ../sample-app
+```
+
+`npm install`を実行して`index.js`を実行します。
+
+```sh
+npm install sample-package@1.0.0 && node index.js
+```
+
+無事にアプリケーションからパッケージを読み込むことができましたら、CodeArtifactのセットアップは完了です。
