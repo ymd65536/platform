@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "CodeBuild IAM Role"
+Parameters:
+  PjName:
+    Type: String
+    Default: Qiita
+
+Resources:
+  QiitaCodeBuildRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: QiitaCodeBuildRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: "codebuild.amazonaws.com"
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - !Ref QiitaCodeBuildPolicy
+      Tags:
+        - Key: Name
+          Value: !Sub "${PjName}"
+  QiitaCodeBuildPolicy:
+    Type: "AWS::IAM::ManagedPolicy"
+    Properties:
+      ManagedPolicyName: codebuild-role
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "ecr:GetAuthorizationToken"
+            Resource:
+              - "*"
+          - Effect: Allow
+            Action:
+              - "logs:CreateLogStream"
+              - "logs:PutLogEvents"
+              - "logs:CreateLogGroup"
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - "s3:PutObject"
+              - "s3:GetObject"
+              - "s3:GetObjectVersion"
+              - "s3:GetBucketAcl"
+              - "s3:GetBucketLocation"
+            Resource:
+              - !Join
+                - ""
+                - - !ImportValue QiitaBucketArn
+                  - "/*"
+              - !ImportValue QiitaBucketArn
+Outputs:
+  QiitaCodeBuildRoleName:
+    Value: !Ref QiitaCodeBuildRole
+    Export:
+      Name: CodeBuildRoleName
