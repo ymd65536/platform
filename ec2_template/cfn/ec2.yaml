@@ -1,0 +1,165 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template to create a VPC, and an EC2 instance within that VPC with a specified IAM role for Systems Manager
+
+Parameters:
+  EC2ImageId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64"
+
+Resources:
+  VPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: MyVPC
+
+  InternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties: 
+      Tags:
+        - Key: Name
+          Value: MyInternetGateway
+
+  AttachGateway:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties: 
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: MyPublicSubnet
+
+  RouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: MyRouteTable
+
+  PublicRoute:
+    Type: 'AWS::EC2::Route'
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  SubnetRouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref RouteTable
+
+  InstanceSecurityGroupA:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      VpcId: !Ref VPC
+      GroupDescription: Allow HTTPS traffic for SSM
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '443'
+          ToPort: '443'
+          CidrIp: 0.0.0.0/0
+
+  InstanceSecurityGroupB:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      VpcId: !Ref VPC
+      GroupDescription: Allow HTTPS traffic for SSM
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '443'
+          ToPort: '443'
+          CidrIp: 0.0.0.0/0
+
+  MyInstanceA:
+    Type: 'AWS::EC2::Instance'
+    Properties: 
+      InstanceType: t3.micro
+      ImageId: !Ref EC2ImageId
+      IamInstanceProfile: !Ref SSMRoleInstanceProfile
+      SecurityGroupIds: 
+        - !Ref InstanceSecurityGroupA
+      SubnetId: !Ref PublicSubnet
+      Tags:
+        - Key: Name
+          Value: MyEC2InstanceA
+
+  MyInstanceB:
+    Type: 'AWS::EC2::Instance'
+    Properties: 
+      InstanceType: t3.micro
+      ImageId: !Ref EC2ImageId
+      IamInstanceProfile: !Ref SSMRoleInstanceProfile
+      SecurityGroupIds: 
+        - !Ref InstanceSecurityGroupB
+      SubnetId: !Ref PublicSubnet
+      Tags:
+        - Key: Name
+          Value: MyEC2InstanceB
+
+
+  SSMRoleInstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties: 
+      Roles: 
+        - !Ref SSMRole
+
+  SSMRole:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: '2012-10-17'
+        Statement: 
+          - Effect: Allow
+            Principal: 
+              Service: 
+                - ec2.amazonaws.com
+            Action: 
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Policies:
+        - PolicyName: ListBucketsPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:ListAllMyBuckets
+                  - s3:CreateBucket
+                  - s3:DeleteBucket
+                  - s3:DeleteObject
+                  - s3:ListBucket
+                  - s3:PutObject
+                  - s3:GetObject
+                Resource: "*"
+Outputs:
+  VPCId:
+    Description: The VPC ID
+    Value: !Ref VPC
+
+  InstanceIdA:
+    Description: The Instance ID
+    Value: !Ref MyInstanceA
+
+  InstanceIdB:
+    Description: The Instance ID
+    Value: !Ref MyInstanceB
+
+  PublicSubnetId:
+    Description: The Subnet ID
+    Value: !Ref PublicSubnet
