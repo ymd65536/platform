@@ -1,0 +1,130 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CodeSv
+Parameters:
+  PjName:
+    Type: String
+    Default: CodeSv
+Resources:
+  CodeSvCodeBuildPj:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Description: CodeBuild
+      Environment:
+        EnvironmentVariables:
+          - Name: AWS_DEFAULT_REGION
+            Type: PLAINTEXT
+            Value: !Ref AWS::Region
+          - Name: AWS_ACCOUNT_ID
+            Type: PLAINTEXT
+            Value: !Ref AWS::AccountId
+          - Name: IMAGE_REPO_NAME
+            Type: PLAINTEXT
+            Value: "dev-image"
+          - Name: IMAGE_TAG
+            Type: PLAINTEXT
+            Value: latest
+
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:4.0
+        Type: LINUX_CONTAINER
+        PrivilegedMode: true
+      Name: !Sub "${PjName}"
+      ServiceRole: !ImportValue CodeBuildRoleName
+      Source:
+        BuildSpec: buildspec.yml
+        Type: CODEPIPELINE
+      Tags:
+        - Key: Name
+          Value: CodeSv
+  CodeSvCloudWatchLogs:
+    Type: "AWS::Logs::LogGroup"
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    Properties:
+      LogGroupName: !Sub "${PjName}"
+      RetentionInDays: 60
+      Tags:
+        - Key: Name
+          Value: !Sub "${PjName}"
+  CodeSvCodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      ArtifactStore:
+        Location: !ImportValue CodeSvBucketName
+        Type: S3
+      Name: !Sub "${PjName}-pipeline"
+      RoleArn: !ImportValue CodePipelineIAMRoleArn
+      Stages:
+        - Actions:
+            - ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeCommit
+                Version: 1
+              Configuration:
+                RepositoryName: !ImportValue CodeRepositoryName
+                BranchName: main
+                PollForSourceChanges: false
+                OutputArtifactFormat: CODE_ZIP
+              Name: Source
+              Namespace: SourceVariables
+              OutputArtifacts:
+                - Name: SourceArtifact
+              Region: ap-northeast-1
+              RunOrder: 1
+          Name: Source
+        - Actions:
+            - ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: 1
+              Configuration:
+                ProjectName: !Ref CodeSvCodeBuildPj
+              InputArtifacts:
+                - Name: SourceArtifact
+              Name: Build
+              Namespace: BuildVariables
+              OutputArtifacts:
+                - Name: BuildArtifact
+              Region: ap-northeast-1
+              RunOrder: 1
+          Name: Build
+      Tags:
+        - Key: Name
+          Value: !Sub "${PjName}"
+  EventBridge:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: for codepipeline
+      EventPattern:
+        source:
+          - aws.codecommit
+        detail-type:
+          - "CodeCommit Repository State Change"
+        resources:
+          - !ImportValue CodeRepositoryArn
+        detail:
+          event:
+            - referenceCreated
+            - referenceUpdated
+          referenceType:
+            - branch
+          referenceName:
+            - main
+      Name: CodeSv-codepipeline
+      State: ENABLED
+      Targets:
+        - Arn:
+            !Join [
+              "",
+              [
+                "arn:aws:codepipeline:ap-northeast-1:",
+                !Sub "${AWS::AccountId}:",
+                !Sub "${PjName}-pipeline",
+              ],
+            ]
+          Id: !Sub "${PjName}-pipeline"
+          RoleArn: !ImportValue EventBridgeTargetRoleArn

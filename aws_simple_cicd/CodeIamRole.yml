@@ -1,0 +1,179 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "CodeSv IAM Role"
+Parameters:
+  PjName:
+    Type: String
+    Default: CodeSv
+
+Resources:
+  CodeSvCodeBuildRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: CodeSvCodeBuildRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: "codebuild.amazonaws.com"
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - !Ref CodeSvCodeBuildPolicy
+      Tags:
+        - Key: Name
+          Value: !Sub "${PjName}"
+  CodeSvCodeBuildPolicy:
+    Type: "AWS::IAM::ManagedPolicy"
+    Properties:
+      ManagedPolicyName: codebuild-role
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "ecr:GetDownloadUrlForLayer"
+              - "ecr:BatchGetImage"
+              - "ecr:BatchCheckLayerAvailability"
+            Resource:
+              - !ImportValue CodeSvECRImageArn
+          - Effect: Allow
+            Action:
+              - "ecr:CompleteLayerUpload"
+              - "ecr:InitiateLayerUpload"
+              - "ecr:UploadLayerPart"
+              - "ecr:PutImage"
+            Resource:
+              - !ImportValue CodeSvECRImageArn
+          - Effect: Allow
+            Action:
+              - "ecr:GetAuthorizationToken"
+            Resource:
+              - "*"
+          - Effect: Allow
+            Action:
+              - "logs:CreateLogStream"
+              - "logs:PutLogEvents"
+              - "logs:CreateLogGroup"
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              - "s3:PutObject"
+              - "s3:GetObject"
+              - "s3:GetObjectVersion"
+              - "s3:GetBucketAcl"
+              - "s3:GetBucketLocation"
+            Resource:
+              - !Join
+                - ""
+                - - !ImportValue CodeSvBucketArn
+                  - "/*"
+              - !ImportValue CodeSvBucketArn
+  EventBridgeIAMPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "codepipeline:StartPipelineExecution"
+            Resource:
+              - !Join [
+                  "",
+                  [
+                    "arn:aws:codepipeline:ap-northeast-1:",
+                    !Sub "${AWS::AccountId}:",
+                    !Sub "${PjName}-pipeline",
+                  ],
+                ]
+      ManagedPolicyName: iam-policy-eventbridge
+  EventBridgeIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - !Ref EventBridgeIAMPolicy
+      RoleName: iam-role-eventbridge
+      Tags:
+        - Key: Name
+          Value: !Sub "${PjName}"
+
+  CodeSvCodePipelineIAMPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "codecommit:CancelUploadArchive"
+              - "codecommit:GetBranch"
+              - "codecommit:GetCommit"
+              - "codecommit:GetRepository"
+              - "codecommit:GetUploadArchiveStatus"
+              - "codecommit:UploadArchive"
+            Resource:
+              - "*"
+          - Effect: Allow
+            Action:
+              - "codebuild:BatchGetBuilds"
+              - "codebuild:StartBuild"
+            Resource:
+              - "*"
+          - Effect: Allow
+            Action:
+              - "s3:PutObject"
+              - "s3:GetObject"
+              - "s3:GetObjectVersion"
+              - "s3:GetBucketAcl"
+              - "s3:GetBucketLocation"
+            Resource:
+              - !Join
+                - ""
+                - - !ImportValue CodeSvBucketArn
+                  - "/*"
+              - !ImportValue CodeSvBucketArn
+      ManagedPolicyName: iam-policy-codepipeline
+  CodeSvCodePipelineIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - !Ref CodeSvCodePipelineIAMPolicy
+      RoleName: iam-role-codepipeline
+      Tags:
+        - Key: Name
+          Value: !Sub "${PjName}"
+Outputs:
+  CodePipelineIAMRole:
+    Value: !GetAtt CodeSvCodePipelineIAMRole.Arn
+    Export:
+      Name: CodePipelineIAMRoleArn
+  CodePipelineIAMPolicy:
+    Value: !Ref CodeSvCodePipelineIAMPolicy
+    Export:
+      Name: CodePipelineIAMPolicyArn
+  CodeSvCodeBuildRoleName:
+    Value: !Ref CodeSvCodeBuildRole
+    Export:
+      Name: CodeBuildRoleName
+  EventBridgeIAMRole:
+    Value: !GetAtt EventBridgeIAMRole.Arn
+    Export:
+      Name: EventBridgeTargetRoleArn
