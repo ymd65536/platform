@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CodeSvImage
+Parameters:
+  PjName:
+    Type: String
+    Default: dev-image
+Resources:
+  CodeSvRepository:
+    Type: AWS::CodeCommit::Repository
+    Properties:
+      RepositoryDescription: !Sub "${PjName} CodeCommit Repositroy"
+      RepositoryName: !Sub "${PjName}"
+      Tags:
+        - Key: Name
+          Value: !Sub "${PjName}"
+  CodeSvCodeBuildECR:
+    Type: "AWS::ECR::Repository"
+    Properties:
+      RepositoryName: !Sub "${PjName}"
+  CodeSvBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      VersioningConfiguration:
+        Status: "Suspended"
+      BucketName: !Sub "${PjName}-bucket-${AWS::AccountId}"
+      AccessControl: "Private"
+      Tags:
+        - Key: "Name"
+          Value: !Sub "${PjName}"
+Outputs:
+  CodeCommitRepositoryName:
+    Value: !GetAtt "CodeSvRepository.Name"
+    Export:
+      Name: CodeRepositoryName
+  CodeCommitRepositoryArn:
+    Value: !GetAtt CodeSvRepository.Arn
+    Export:
+      Name: CodeRepositoryArn
+  CodeCommitRepositoryUrl:
+    Value: !GetAtt CodeSvRepository.CloneUrlHttp
+    Export:
+      Name: CodeRepositoryUrl
+  Arn:
+    Value: !GetAtt CodeSvBucket.Arn
+    Export:
+      Name: CodeSvBucketArn
+  Name:
+    Value: !Ref CodeSvBucket
+    Export:
+      Name: CodeSvBucketName
+  CodeSvECRArn:
+    Value: !GetAtt CodeSvCodeBuildECR.Arn
+    Export:
+      Name: CodeSvECRImageArn
+  CodeSvECR:
+    Value: !Ref CodeSvCodeBuildECR
+    Export:
+      Name: CodeSvECRImageURL
