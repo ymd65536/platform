@@ -2,6 +2,6 @@
     "require": {
         "google/protobuf": "^4.27",
         "grpc/grpc": "^1.57",
-        "ext-gd": "*"
+        "monolog/monolog": "^2.9"
     }
 }
