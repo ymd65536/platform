@@ -26,6 +26,7 @@ docker compose up -d
 docker-compose exec my-php-app composer --version
 docker-compose exec my-php-app composer update
 docker-compose exec my-php-app composer install
+docker exec -it compose-my-php-app-1 bash
 docker compose down
 ```
 
@@ -35,4 +36,9 @@ docker compose down
 composer require grpc/grpc
 composer require google/protobuf
 composer require momentohq/client-sdk-php
+composer require monolog/monolog
 ```
+
+## php.ini
+
+`/usr/local/etc/php/php.ini-production`を変更する。
