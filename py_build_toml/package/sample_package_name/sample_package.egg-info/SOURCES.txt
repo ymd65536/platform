@@ -1,0 +1,10 @@
+README.md
+pyproject.toml
+sample_package_name/__init__.py
+sample_package_name/root_module.py
+sample_package_name/sample_package.egg-info/PKG-INFO
+sample_package_name/sample_package.egg-info/SOURCES.txt
+sample_package_name/sample_package.egg-info/dependency_links.txt
+sample_package_name/sample_package.egg-info/top_level.txt
+sample_package_name/sub/__init__.py
+sample_package_name/sub/module.py

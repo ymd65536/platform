@@ -1,0 +1,11 @@
+[project]
+name="sample-package"
+version="0.1.0"
+description="toml file for python build"
+
+[tool.setuptools]
+package-dir = {"" = "sample_package_name"}
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
