@@ -1,3 +1,6 @@
 .DS_Store
 company.md
 vendor
+
+# aws_simple_ecs
+task-definition.json
