@@ -27,3 +27,4 @@
 |14|py_build_toml|tomlファイルを使ってPythonのパッケージをビルドする|
 |15|py_jinja2|FlaskでJinja2を使うサンプル|
 |16|test_nginx|nginxのテスト|
+|17|flask_blog_app|Flaskでブログアプリを作成する|
