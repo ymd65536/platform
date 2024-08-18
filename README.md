@@ -10,7 +10,7 @@
 ## フォルダの説明
 
 |項番|フォルダ名|説明|
-|:--:|:--:|:--|
+|:--:|:--|:--|
 |1|awscli|AWS CLIの使い方|
 |2|aws_amplify|AWS Amplifyの使い方|
 |3|aws_build_image|AWSでDockerイメージをビルドするインフラ構成|
