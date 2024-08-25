@@ -1,0 +1,12 @@
+{
+    "environments": [
+        {
+            "name": "param1",
+            "value": "a"
+        },
+        {
+            "name": "param2",
+            "value": "b"
+        }
+    ]
+}
