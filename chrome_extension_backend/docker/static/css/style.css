@@ -1,0 +1,35 @@
+p {
+    font-size: 14px;
+}
+
+h1 {
+    font-size: 24px;
+    margin: 0px;
+}
+
+.result {
+    background-color: #ffffff;
+    width: 600px;
+    margin: 30px auto;
+    text-align: center;
+    border: 1px solid #d1d1d1;
+    padding: 30px;
+}
+
+body {
+    background-color: #fafafa;
+}
+
+.img_src {
+    background-color: #ffffff;
+    margin: 30px auto;
+    text-align: center;
+    border: 1px solid #d1d1d1;
+}
+
+img {
+    object-fit: cover;
+    width: 90%;
+    margin: 30px 10px 30px 10px;
+    border: solid 1px #777777;
+}
