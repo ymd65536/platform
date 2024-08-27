@@ -1,0 +1,10 @@
+# ビルドステージ
+FROM node:16 as builder
+WORKDIR /usr/src/app
+RUN npm install react react-dom
+
+# ランタイムステージ
+FROM nginx:stable-alpine
+COPY --from=builder /usr/src/app /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
