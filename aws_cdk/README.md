@@ -38,3 +38,27 @@
 - デプロイ時に利用するパラメータを記述するファイル
 
 構成を変更したら、`cdk.context.json`を削除してからcdk deployすること。これをやらないと古いパラメータを元にスタックを作成しようと試みるため、エラーが発生する。
+
+## チュートリアル
+
+### 全体
+
+- cdk version
+  - 2.153.0 (build 2bccd85)
+
+### CDKの基本
+
+テンプレートを使ってプロジェクトを作成する場合は以下のとおりです。
+
+```text
+* app: Template for a CDK Application
+   └─ cdk init app --language=[csharp|fsharp|go|java|javascript|python|typescript]
+* lib: Template for a CDK Construct Library
+   └─ cdk init lib --language=typescript
+* sample-app: Example CDK Application with some constructs
+   └─ cdk init sample-app --language=[csharp|fsharp|go|java|javascript|python|typescript]
+```
+
+```bash
+cdk init app --language=typescript
+```
