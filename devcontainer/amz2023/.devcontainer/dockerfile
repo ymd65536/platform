@@ -1,0 +1,2 @@
+FROM public.ecr.aws/amazonlinux/amazonlinux:2023-minimal
+RUN dnf install -y git tar gzip unzip python3 python3-pip docker && pip install awscli pip==21.3.1 && pip install --force-reinstall build twine && curl https://get.volta.sh | bash && /root/.volta/bin/volta install node@18
