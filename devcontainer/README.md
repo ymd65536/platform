@@ -56,3 +56,27 @@ Rancher-Desktopと組み合わせて利用するときは以下の2点に注意�
 ```bash
 docker rmi $(docker images -f "dangling=true" -q)
 ```
+
+## Amazon Linux 2023イメージについて
+
+[AL2023 最小コンテナイメージ - amazon user guide](https://docs.aws.amazon.com/ja_jp/linux/al2023/ug/minimal-container.html)
+
+awscliをzipでインストールしたら以下のエラーが発生した。
+※awscliのインストール方法: [リンク](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+
+```text
+Cannot uninstall Pygments 2.7.4, RECORD file not found
+```
+
+dnfではなくpipでインストールするとエラーは発生しない。
+
+Pygmentsについては以下のリンクを参照してください。
+
+- [Pygments](https://pygments.org/)
+
+## 参考
+
+- [Developing inside a Container](https://code.visualstudio.com/docs/devcontainers/containers#_create-a-devcontainerjson-file)
+- [Add another local file mount](https://code.visualstudio.com/remote/advancedcontainers/add-local-file-mount)
+- [Alternate ways to install Docker](https://code.visualstudio.com/remote/advancedcontainers/docker-options)
+- [Create a Dev Container](https://code.visualstudio.com/docs/devcontainers/create-dev-container)
