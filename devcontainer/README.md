@@ -176,3 +176,9 @@ AWS CLIを使う場合はさまざまな方法でインストールできるた�
 ### dockerを使う場合
 
 `mcr.microsoft.com/devcontainers/typescript-node`を使うと良いでしょう。
+
+## outside of docker
+
+[outside of docker](https://github.com/devcontainers/features/tree/main/src/docker-outside-of-docker)
+
+[typescript-node](https://mcr.microsoft.com/en-us/product/devcontainers/typescript-node/tags)
