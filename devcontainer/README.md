@@ -80,3 +80,44 @@ Pygmentsについては以下のリンクを参照してください。
 - [Add another local file mount](https://code.visualstudio.com/remote/advancedcontainers/add-local-file-mount)
 - [Alternate ways to install Docker](https://code.visualstudio.com/remote/advancedcontainers/docker-options)
 - [Create a Dev Container](https://code.visualstudio.com/docs/devcontainers/create-dev-container)
+
+## devcontainerに使うコンテナイメージについて
+
+実際にdevcontainerを使ってみて、開発に使うコンテナイメージの選定には気をつけないといけません。
+選定をする際のポイントは以下の通りです。
+
+- どんなコマンドを実行するか
+- どんなライブラリ/パッケージを使うか
+- どのような環境と連携するか
+
+他にも以下のようなポイントがありますが、今回は扱いません。
+
+- セキュリティ
+- コンテナイメージのサイズ
+- メンテナンス（コンテナイメージのサポート期間やバージョン管理）
+
+では、実際にポイントを見ていきましょう。
+
+## どんなコマンドを実行するか
+
+devcontainer上で実行するコマンドによって、コンテナイメージを選定する必要があります。
+たとえば、AWS CDKを使う場合はNode.jsをインストールされているコンテナイメージか
+あるいはNode.jsをインストールできるコンテナイメージを選定する必要があります。
+
+Node.jsをインストールできるコンテナイメージを選定する場合は
+どのパッケージマネージャを使うかどうかも考慮する必要があります。
+たとえば、debian系なら`apt-get`、RedHat系なら`yum`、`dnf`、`rpm`などを使った方法があります。
+
+他にもAWS CLIを使う場合はさまざまな方法でインストールできるため、どの方法を利用してインストールするか選定する必要があります。
+
+### AWS CDKを使う場合
+
+AWS CDKを使う場合はNode.jsをインストールできるコンテナイメージを選定する必要があります。
+
+### AWS CLIを使う場合
+
+AWS CLIを使う場合はさまざまな方法でインストールできるため、どの方法を利用してインストールするか選定する必要があります。
+
+### dockerを使う場合
+
+`mcr.microsoft.com/devcontainers/typescript-node`を使うと良いでしょう。
