@@ -3,3 +3,4 @@ RUN curl 'https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip' -o 'aws-cli
     unzip aws-cli.zip && \
     sudo ./aws/install && \
     rm -rf aws aws-cli.zip
+USER node
