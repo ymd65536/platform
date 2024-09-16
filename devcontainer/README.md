@@ -12,6 +12,61 @@ Rancher-Desktopと組み合わせて利用するときは以下の2点に注意�
 [Rancher-Desktop](https://rancherdesktop.io/)
 [Rancher-Desktop - GitHub](https://github.com/rancher-sandbox/rancher-desktop)
 
+## Amazon Linux 2023イメージを使う
+
+```dockerfile
+FROM public.ecr.aws/ubuntu/ubuntu:24.04_stable
+RUN apt install python3-pip python3 -y && pip install awscli && curl https://get.volta.sh | bash && RUN /root/.volta/bin/volta install node@18
+```
+
+```json
+{
+    "name": "deploy-container",
+    "build": { "dockerfile": "dockerfile" },
+    "customizations": {
+        // Configure properties specific to VS Code.
+        "vscode": {
+            // Add the IDs of extensions you want installed when the container is created.
+            "extensions": []
+            
+        }
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "version": "latest",
+            "moby": true
+        }
+    },
+    "mounts": [
+        "source=${localEnv:HOME}/.aws,target=/root/.aws,type=bind"
+    ],
+    "postCreateCommand": "npm install -g aws-cdk@2.153.0"
+}
+```
+
+```json
+{
+    "name": "Docker in Docker",
+    "dockerFile": "Dockerfile",
+    "runArgs": [
+        "--init",
+        "--privileged"
+    ],
+    "features": {
+        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+    },
+    "customizations": {
+        "vscode": {
+        }
+    },
+    "mounts": [
+        "source=${localEnv:HOME}/.aws,target=/home/node/.aws,type=bind",
+        "source=${localEnv:HOME}/.docker,target=/home/node/.docker,type=bind"
+    ],
+    "postCreateCommand": "npm install -g aws-cdk@2.153.0"
+}
+```
+
 ## typescript-node
 
 ```json
