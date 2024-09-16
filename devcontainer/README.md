@@ -19,6 +19,11 @@ FROM public.ecr.aws/ubuntu/ubuntu:24.04_stable
 RUN apt install python3-pip python3 -y && pip install awscli && curl https://get.volta.sh | bash && RUN /root/.volta/bin/volta install node@18
 ```
 
+```dockerfile
+FROM public.ecr.aws/amazonlinux/amazonlinux:2023-minimal
+RUN dnf install -y git tar gzip unzip python3 python3-pip docker && pip install awscli pip==21.3.1 && pip install --force-reinstall build twine && curl https://get.volta.sh | bash && /root/.volta/bin/volta install node@18
+```
+
 ```json
 {
     "name": "deploy-container",
