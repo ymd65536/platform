@@ -1,0 +1,5 @@
+FROM mcr.microsoft.com/vscode/devcontainers/typescript-node:18
+RUN curl 'https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip' -o 'aws-cli.zip' && \
+    unzip aws-cli.zip && \
+    sudo ./aws/install && \
+    rm -rf aws aws-cli.zip
