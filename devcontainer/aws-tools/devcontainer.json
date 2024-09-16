@@ -16,7 +16,7 @@
         }
     },
     "mounts": [
-        "source=${localEnv:HOME}/.aws,target=/root/.aws,type=bind"
+        "source=${localEnv:HOME}/.aws,target=/home/node/.aws,type=bind"
     ],
     "postCreateCommand": "npm install -g aws-cdk@2.153.0"
 }
