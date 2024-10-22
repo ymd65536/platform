@@ -1,0 +1,30 @@
+{
+    "name": "PlatformContainer",
+    "image": "mcr.microsoft.com/devcontainers/python:0-3.11-bullseye",
+    "postCreateCommand": "sh .devcontainer/postCreateCommand.sh",
+    "features": {
+        "ghcr.io/devcontainers-extra/features/gh-cli": {}
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "VisualStudioExptTeam.vscodeintellicode",
+                "DavidAnson.vscode-markdownlint",
+                "yzhang.markdown-all-in-one",
+                "ms-python.flake8",
+                "ms-python.black-formatter",
+                "ms-python.vscode-pylance",
+                "ms-python.python",
+                "ms-python.debugpy",
+                "njpwerner.autodocstring"
+            ]
+        }
+    },
+    "containerEnv":{
+        "TZ": "Asia/Tokyo"
+    },
+    "mounts": [
+        "source=${localEnv:HOME}/,target=/home/vscode/,type=bind",
+        "source=${localEnv:HOME}/rootcaCert.pem,target=/etc/ssl/certs/ca.pem,type=bind,ro"
+    ]
+}
