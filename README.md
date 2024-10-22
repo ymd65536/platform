@@ -42,3 +42,12 @@ git config --global user.name "{github username}"
 git config --global user.email "{github email}"
 git config --global user.name && git config --global user.email
 ```
+
+## トラブルシューティング
+
+`git push`で`SSL certificate problem: self signed certificate in certificate chain`が出る場合は
+以下のコマンドを実行して、証明書を追加してください。
+
+```bash
+git config --global http.sslCAInfo ~/SSL-TrustCA.crt
+```
