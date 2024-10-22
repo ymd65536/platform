@@ -28,3 +28,17 @@
 |15|py_jinja2|FlaskでJinja2を使うサンプル|
 |16|test_nginx|nginxのテスト|
 |17|flask_blog_app|Flaskでブログアプリを作成する|
+
+## Dev ContainerのpostCreateCommand.shのセットアップ
+
+Dev Containerではユーザーフォルダにある`postCreateCommand.sh`を利用しています。
+
+`postCreateCommand.sh`では以下の設定を行っています。
+
+```bash
+# /bin/bash
+clear
+git config --global user.name "{github username}"
+git config --global user.email "{github email}"
+git config --global user.name && git config --global user.email
+```
