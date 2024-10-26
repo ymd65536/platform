@@ -24,6 +24,6 @@
     },
     "mounts": [
         "source=${localEnv:HOME}/,target=/home/vscode/,type=bind",
-        "source=${localEnv:HOME}/rootcaCert.pem,target=/etc/ssl/certs/ca.pem,type=bind,ro"
+        // "source=${localEnv:HOME}/rootcaCert.pem,target=/etc/ssl/certs/ca.pem,type=bind,ro"
     ]
 }
