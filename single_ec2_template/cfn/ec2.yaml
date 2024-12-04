@@ -46,7 +46,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       GroupDescription: Allow HTTPS traffic for SSM
-      SecurityGroupEgress:
+      SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: '443'
           ToPort: '443'
@@ -86,6 +86,40 @@ Resources:
       Path: /
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+  # Add VPC Endpoint for SSM
+  VPCEndpointSSM:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ssm'
+      VpcId: !Ref VPC
+      VpcEndpointType: Interface
+      SubnetIds:
+        - !Ref PrivateSubnet
+      SecurityGroupIds:
+        - !Ref InstanceSecurityGroupA
+
+  VPCEndpointSSMMessages:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ssmmessages'
+      VpcId: !Ref VPC
+      VpcEndpointType: Interface
+      SubnetIds:
+        - !Ref PrivateSubnet
+      SecurityGroupIds:
+        - !Ref InstanceSecurityGroupA
+
+  VPCEndpointEC2Messages:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      ServiceName: !Sub 'com.amazonaws.${AWS::Region}.ec2messages'
+      VpcId: !Ref VPC
+      VpcEndpointType: Interface
+      SubnetIds:
+        - !Ref PrivateSubnet
+      SecurityGroupIds:
+        - !Ref InstanceSecurityGroupA
 
 Outputs:
   VPCId:
