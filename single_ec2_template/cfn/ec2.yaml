@@ -46,7 +46,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       GroupDescription: Allow HTTPS traffic for SSM
-      SecurityGroupIngress:
+      SecurityGroupEgress:
         - IpProtocol: tcp
           FromPort: '443'
           ToPort: '443'
