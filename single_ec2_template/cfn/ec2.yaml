@@ -51,6 +51,11 @@ Resources:
           FromPort: '443'
           ToPort: '443'
           CidrIp: 0.0.0.0/0
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '443'
+          ToPort: '443'
+          CidrIp: 0.0.0.0/0
 
   MyInstanceA:
     Type: 'AWS::EC2::Instance'
@@ -98,6 +103,7 @@ Resources:
         - !Ref PrivateSubnet
       SecurityGroupIds:
         - !Ref InstanceSecurityGroupA
+      PrivateDnsEnabled: true
 
   VPCEndpointSSMMessages:
     Type: 'AWS::EC2::VPCEndpoint'
@@ -109,6 +115,7 @@ Resources:
         - !Ref PrivateSubnet
       SecurityGroupIds:
         - !Ref InstanceSecurityGroupA
+      PrivateDnsEnabled: true
 
   VPCEndpointEC2Messages:
     Type: 'AWS::EC2::VPCEndpoint'
@@ -120,6 +127,7 @@ Resources:
         - !Ref PrivateSubnet
       SecurityGroupIds:
         - !Ref InstanceSecurityGroupA
+      PrivateDnsEnabled: true
 
 Outputs:
   VPCId:
